@@ -303,8 +303,8 @@ class GeoSeries(GeoPandasBase, Series):
                 raise TypeError('Must set either crs or epsg for output.')
         proj_in = pyproj.Proj(self.crs, preserve_units=True)
         proj_out = pyproj.Proj(crs, preserve_units=True)
-        project = partial(pyproj.transform, proj_in, proj_out)
-        result = self.apply(lambda geom: transform(project, geom))
+        transformer = pyproj.Transformer.from_proj(proj_in, proj_out)
+        result = self.apply(lambda geom: transform(transformer.transform, geom))
         result.__class__ = GeoSeries
         result.crs = crs
         result._invalidate_sindex()
